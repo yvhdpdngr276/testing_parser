@@ -1,136 +1,81 @@
 from bs4 import BeautifulSoup
-from playwright.sync_api import sync_playwright
-import requests
-import re
-import time
-from pypasser import reCaptchaV2
-from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+import time
+from .trash_detector import DetectionSlovak
+from .capcha_solver import CapchaSolver
 
-
-#Класс для создание пользователя для дальнейшего использования
+# Класс для создания пользователя для дальнейшего использования
 class UserLogin:
 
-    # Установка страницы браузера для парсинга
-    def __init__(self,page):
-        self.page = page
+    # Установка драйвера браузера для парсинга
+    def __init__(self, driver):
+        self.driver = driver
+        self.wait = WebDriverWait(driver, 10)
+        self.solve_captcha = CapchaSolver()
 
-    #Проверяет наличие капчи на странице
-    def _has_recaptcha(self) -> bool:
-
-        try:
-            if self.page.locator('iframe[src*="recaptcha"]').count() > 0:
-                return True
-            if self.page.locator('#g-recaptcha, .g-recaptcha').count() > 0:
-                return True
-            return False
-        except Exception:
-            return False
-
-    def _solve_captcha_auto(self) -> str:
-        """
-        Автоматически решает капчу через Selenium + pypasser
-
-        Returns:
-            Токен капчи или пустую строку
-        """
-        print("[*] Запуск автоматического решения капчи...")
-
-        current_url = self.page.url
-
-        # Создаем Selenium driver для решения капчи
-        options = webdriver.ChromeOptions()
-        options.add_argument('--disable-blink-features=AutomationControlled')
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option('useAutomationExtension', False)
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--no-sandbox')
-
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=options)
-
-        try:
-            driver.get(current_url)
-            time.sleep(2)
-
-            # Автоматическое решение через pypasser
-            print("[*] Решаем капчу автоматически (может занять 30-60 сек)...")
-            is_solved = reCaptchaV2(driver=driver, play=False)
-
-            if is_solved:
-                print("[✓] Capcha solved automatically.!")
-
-                # Получаем токен
-                token = driver.execute_script(
-                    "return document.querySelector('[name=\"g-recaptcha-response\"]').value"
-                )
-                return token
-            else:
-                print("[✗] Cant solve captcha.")
-                return ""
-
-        except Exception as e:
-            print(f"[✗] Error with solving capcha: {e}")
-            return ""
-        finally:
-            driver.quit()
-
-    # Создания всех полей для заполнения для захода а так же передачя url перехода
+    # Создания всех полей для заполнения для захода а так же передача url перехода
     def user_login(self, url: str, email: str, email_locator: str):
 
-        self.page.goto(url)
-        self.page.locator(email_locator).fill(email)
+        self.driver.get(url)
+        time.sleep(2)
+
+        # Заполняем email
+        email_field = self.wait.until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, email_locator))
+        )
+        email_field.clear()
+        email_field.send_keys(email)
 
         # Проверяем наличие капчи
-        if self._has_recaptcha():
-            print("[!] Find a captcha.")
-
-            # Автоматически решаем капчу через Selenium
-            captcha_token = self._solve_captcha_auto()
-
-            if captcha_token:
-                # Вставляем токен обратно в Playwright
-                self.page.evaluate(f"""
-                    () => {{
-                        const element = document.querySelector('[name="g-recaptcha-response"]');
-                        if (element) {{
-                            element.value = '{captcha_token}';
-                        }}
-                    }}
-                """)
-                print("[✓] Token of capcha solved return")
-            else:
-                print("[✗] Cannot solve captcha automatically.")
+        if self.solve_captcha.has_recaptcha(self.driver, verbose=True):
+            if not self.solve_captcha.if_captcha(self.driver):
+                print("[✗] Failed to solve captcha during login")
                 return False
 
         # Кликаем кнопку отправки
-        self.page.get_by_role('button').click()
-        self.page.wait_for_load_state('networkidle')
+        try:
+            submit_button = self.driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+            submit_button.click()
+        except:
+            # Если не нашли по type, ищем любую кнопку
+            submit_button = self.driver.find_element(By.TAG_NAME, 'button')
+            submit_button.click()
+
+        time.sleep(3)
         return True
 
-#Основной класс парсинга страницы
+
+# Основной класс парсинга страницы
 class NewPageAnswer(UserLogin):
-    def __init__(self,page):
-        super().__init__(page)
+
+    def __init__(self, driver, selected_element: str):
+        super().__init__(driver)
         self.last_question = None
+        self.selected_element = selected_element
 
-    #Основная функция для выбора нужного нам текста со страницы
-    def parse_text(self, selected_element: str) -> str|None:
+    # Основная функция для выбора нужного нам текста со страницы
+    def parse_text(self, selected_element: str = None) -> str|None:
+        if selected_element is None:
+            selected_element = self.selected_element
 
-        html = self.page.content()
-        if html:
-            soup = BeautifulSoup(html,'html.parser')
-            element = soup.select_one(selected_element)
-            if element:
-                question = element.get_text().strip()
-                return question
+        try:
+            html = self.driver.page_source
+            if html:
+                soup = BeautifulSoup(html, 'html.parser')
+                element = soup.select_one(selected_element)
+                if element:
+                    question = element.get_text().strip()
+                    return question
+                else:
+                    print(f"[✗] No text found for selector: {selected_element}")
+                    return None
             else:
-                print("No text found")
+                print("[✗] Can't find - html content")
                 return None
-        else:
-            print("Can't find - html content")
+        except Exception as e:
+            print(f"[✗] Error parsing text: {e}")
             return None
 
     # Выбор нового вопроса
@@ -142,34 +87,79 @@ class NewPageAnswer(UserLogin):
 
             new_question = self.parse_text()
             if new_question and new_question != old_question:
-                print("New question found")
+                print("[✓] New question found")
                 return True
             time.sleep(0.5)
 
-        print("No new question found ----- timeout")
+        print("[✗] No new question found ----- timeout")
         return False
 
     # Функция нажатия на кнопку ответа | которая будет его принимать от LLM которую мы укажем позже
-    def click_answer(self, answer: str, current_question: str, btn_no_locator: str, btn_yes_locator: str) -> bool:
+    def click_answer(self, current_question: str, btn_no_locator: str, btn_yes_locator: str) -> bool:
 
         try:
-            if answer == 'yes':
-                print('Correct text go to proceed')
-                self.page.locator(btn_yes_locator).click()
+            print(f"[DEBUG] Starting to process answer to question...")
+            print(f"[DEBUG] Selectors: YES='{btn_yes_locator}', NO='{btn_no_locator}'")
+
+            # Determine which button to click
+            if DetectionSlovak.is_slovak(current_question):
+                print('[✓] Correct text go to proceed')
+                print(f"[DEBUG] Searching for YES button: {btn_yes_locator}")
+                try:
+                    button = self.driver.find_element(By.CSS_SELECTOR, btn_yes_locator)
+                    print(f"[DEBUG] YES button found")
+                except Exception as e:
+                    print(f"[✗] YES button not found: {e}")
+                    # Try to find all buttons
+                    all_buttons = self.driver.find_elements(By.TAG_NAME, 'button')
+                    print(f"[DEBUG] Total buttons on page: {len(all_buttons)}")
+                    return False
             else:
-                print('Incorrect text -------- trash')
-                self.page.locator(btn_no_locator).click()
+                print('[✗] Incorrect text -------- trash')
+                print(f"[DEBUG] Searching for NO button: {btn_no_locator}")
+                try:
+                    button = self.driver.find_element(By.CSS_SELECTOR, btn_no_locator)
+                    print(f"[DEBUG] NO button found")
+                except Exception as e:
+                    print(f"[✗] NO button not found: {e}")
+                    # Try to find all buttons
+                    all_buttons = self.driver.find_elements(By.TAG_NAME, 'button')
+                    print(f"[DEBUG] Total buttons on page: {len(all_buttons)}")
+                    return False
 
+            print("[DEBUG] Trying to click button...")
+            button.click()
+            print("[DEBUG] Button clicked successfully, waiting for load...")
+            time.sleep(3)
 
-            self.page.wait_for_load_state('networkidle')
+            # Check for captcha after click
+            if self.solve_captcha.has_recaptcha(self.driver, verbose=True):
+                print("[!] Captcha appeared after click, solving...")
+                if not self.solve_captcha.if_captcha(self.driver):
+                    print("[✗] Failed to solve captcha after click")
+                    return False
 
-            if not self.get_new_question(current_question):
-                print("Question not changed")
-                return False
+                print("[✓] Captcha solved, waiting for page to update...")
+                time.sleep(3)
+            else:
+                print("[✓] No captcha detected after click")
+
+            # Check if question changed (give more time)
+            print("[DEBUG] Checking if question changed...")
+            if not self.get_new_question(current_question, timeout=15):
+                print("[✗] Question not changed after 15 seconds")
+
+                # Perhaps question already changed during captcha solving
+                new_q = self.parse_text()
+                if new_q and new_q != current_question:
+                    print("[✓] Question already changed during captcha solving")
+                    return True
+                else:
+                    print("[✗] Question really didn't change")
+                    return False
 
             return True
 
-        except Exception as e :
-            print({e})
+        except Exception as e:
+            print(f"[✗] Error clicking answer: {e}")
             return False
-
