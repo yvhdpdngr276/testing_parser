@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 import time
 from .trash_detector import DetectionSlovak
 from .capcha_solver import CapchaSolver
+from ollama.ollama import OllamaTextAnalyzer
 
 # Класс для создания пользователя для дальнейшего использования
 class UserLogin:
@@ -55,6 +56,11 @@ class NewPageAnswer(UserLogin):
         self.last_question = None
         self.selected_element = selected_element
 
+        self.analyzer = OllamaTextAnalyzer(
+            model_name="gpt-oss",
+            system_prompt = None
+        )
+
     # Основная функция для выбора нужного нам текста со страницы
     def parse_text(self, selected_element: str = None) -> str|None:
         if selected_element is None:
@@ -101,8 +107,17 @@ class NewPageAnswer(UserLogin):
             print(f"[DEBUG] Starting to process answer to question...")
             print(f"[DEBUG] Selectors: YES='{btn_yes_locator}', NO='{btn_no_locator}'")
 
+            # Analyze question with Ollama
+            try:
+                is_good = self.analyzer.analyze(current_question)
+                print(f"[✓] Ollama analysis result: {is_good}")
+            except (ConnectionError, TimeoutError, ValueError) as e:
+                print(f"[✗] Ollama analysis failed: {e}")
+                # If Ollama fails, fall back to language detection only
+                is_good = True
+
             # Determine which button to click
-            if DetectionSlovak.is_slovak(current_question):
+            if DetectionSlovak.is_slovak(current_question) and is_good:
                 print('[✓] Correct text go to proceed')
                 print(f"[DEBUG] Searching for YES button: {btn_yes_locator}")
                 try:
