@@ -1,3 +1,11 @@
+# ============================================================================
+# TEMPORARILY DISABLED: This module is not currently used
+# ============================================================================
+# Currently using only Ollama for text analysis.
+# LangDetect functionality might be re-enabled in future versions.
+# The code is kept for reference and potential future use.
+# ============================================================================
+
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 

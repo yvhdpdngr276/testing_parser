@@ -74,6 +74,9 @@ class OllamaTextAnalyzer:
             result = response.json()
             model_response = result.get("response", "").strip().lower()
 
+            # DEBUG: Print raw model response
+            print(f"[DEBUG] Ollama raw response: '{model_response}'")
+
             # Извлечение булева значения
             return self.parse_boolean_response(model_response)
 
@@ -103,24 +106,25 @@ class OllamaTextAnalyzer:
         response = response.strip().lower()
 
         # Проверка различных вариантов ответа
-        if "true" in response or "nie" in response or "yes" in response:
+        # ano = yes (да), nie = no (нет) в словацком
+        if "true" in response or "yes" in response or "ano" in response:
             return True
-        elif "false" in response or "ano" in response or "no" in response:
+        elif "false" in response or "no" in response or "nie" in response:
             return False
         else:
             raise ValueError(
                 f"Model answer not correct: '{response}'. "
-                "Expected 'true' or 'false'."
+                "Expected 'yes'/'no' or 'ano'/'nie'."
             )
 
-    def set_system_prompt(self, new_prompt: str):
-        """
-        Обновляет системный промпт.
-
-        Args:
-            new_prompt: Новый системный промпт
-        """
-        self.system_prompt = new_prompt
+    # def set_system_prompt(self, new_prompt: str):
+    #     """
+    #     Обновляет системный промпт.
+    #
+    #     Args:
+    #         new_prompt: Новый системный промпт
+    #     """
+    #     self.system_prompt = new_prompt
 
 
 # Пример использования
