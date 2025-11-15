@@ -1,12 +1,12 @@
-# 😊 Automated Text Classification & Captcha Solver
+#  🎭 Automated WEB Extracted Text Classification <br> & Captcha Solver 
 
 An automated web scraping and text classification tool using Selenium, BeautifulSoup4, Ollama AI, and PyPasser for captcha solving.
 
-## 📋 Description
+## 📑 Description
 
 This project automates the process of logging into a website, solving reCAPTCHA v2 challenges, extracting text from web pages, and classifying that text using a local AI model (Ollama with gpt-oss). Based on the AI's classification, the bot automatically clicks appropriate buttons (Yes/No) to approve or reject content according to predefined criteria.
 
-## 🎯 Key Features
+## 📍 Key Features
 
 - **Automated Login** - Email-based authentication with anti-detection measures
 - **reCAPTCHA v2 Solver** - Automatic captcha solving using PyPasser with manual fallback
@@ -24,7 +24,7 @@ This project automates the process of logging into a website, solving reCAPTCHA 
 - **PyPasser** - Automated reCAPTCHA v2 solving
 - **Python 3.13** - Core programming language
 
-## 📦 Installation
+## 📥 Installation
 
 ### Prerequisites
 
@@ -52,8 +52,7 @@ ollama pull gpt-oss
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd <project-folder>
+git clone https://github.com/yvhdpdngr276/testing_parser.git
 ```
 
 2. Create a virtual environment (recommended):
@@ -133,149 +132,7 @@ MAX_RESTARTS = 5             # Maximum restart attempts on errors
 PROGRESS_FILE = "progress.json"
 ```
 
-## 🚀 Usage
-
-### Testing Captcha Solving (Demo)
-
-Before running the main program, you can test the captcha solving functionality using the demo script:
-```bash
-python parser/try.py
-```
-
-**What it does:**
-- Opens Google's reCAPTCHA v2 demo page
-- Automatically attempts to solve the captcha using PyPasser
-- Clicks the submit button if successful
-- Shows "SUCCESS" or "FAIL" message
-
-**Use this to:**
-- Verify PyPasser is working correctly
-- Test your Chrome/Chromium installation
-- Check anti-detection settings
-- Understand captcha solving process before using main script
-
-**Expected output:**
-```
-Setting up Chrome driver...
-[INFO] pypasser patched successfully
-Running pypasser...
-SUCCESS
-```
-
-### Basic Run
-```bash
-python main.py
-```
-
-### What Happens
-
-1. **Login** - Automatically logs in with provided email
-2. **Captcha Detection** - Checks for reCAPTCHA v2
-3. **Captcha Solving** - Attempts automatic solving (30-120 seconds)
-   - If automatic fails → switches to manual mode (3 minutes timeout)
-4. **Question Loop** - For each question:
-   - Extracts text from page using CSS selector
-   - Sends text to Ollama for AI analysis
-   - Clicks "Yes" button if text is good (true)
-   - Clicks "No" button if text is bad (false)
-   - Handles captcha if it appears again
-   - Waits for new question to load
-5. **Progress Saving** - Saves progress after each question
-6. **Auto-Restart** - Automatically restarts on critical errors
-
-### Progress Tracking
-
-If the program crashes or is interrupted:
-- Progress is saved in `progress.json`
-- Next run automatically resumes from the last completed question
-- No need to start from scratch
-
-### Manual Captcha Solving
-
-If automatic captcha solving fails:
-```
-==================================================================
-  MANUAL CAPTCHA SOLVING REQUIRED
-==================================================================
-  Please solve the captcha in the browser.
-  You have 3 minute(s) and 0 seconds.
-  The program will continue automatically.
-==================================================================
-```
-
-Simply solve the captcha in the browser window - the program will detect completion and continue.
-
-## 📊 Project Structure
-```
-.
-├── main.py                        # Entry point and main logic
-├── config.py                      # Configuration file (create this)
-├── requirements.txt               # Python dependencies
-├── progress.json                  # Progress tracker (auto-generated)
-│
-├── parser/
-│   ├── __init__.py
-│   ├── parse.py                   # Text parsing and answer logic
-│   ├── capcha_solver.py           # reCAPTCHA detection and solving
-│   ├── trash_detector.py          # Language detection (deprecated)
-│   └── try.py                     # Captcha solving demo (test this first!)
-│
-├── ollama/
-│   ├── __init__.py
-│   └── ollama.py                  # Ollama API integration
-│
-├── .github/
-│   └── ISSUE_TEMPLATE/
-│       └── bug_report.md          # Bug report template
-│
-└── .idea/                         # PyCharm project files
-```
-
-## 🔧 How It Works
-
-### 1. Login Flow
-```python
-UserLogin.user_login()
-├── Navigate to login URL
-├── Enter email
-├── Check for captcha
-├── Solve captcha if present
-└── Click submit button
-```
-
-### 2. Text Classification Flow
-```python
-NewPageAnswer.click_answer()
-├── Parse text from page (BeautifulSoup4)
-├── Send to Ollama for analysis
-├── Receive true/false response
-├── Click appropriate button (Yes/No)
-├── Check for captcha
-└── Wait for new question
-```
-
-### 3. Captcha Solving Strategy
-```python
-CapchaSolver.if_captcha()
-├── Detect reCAPTCHA iframe
-├── Try automatic solving (PyPasser)
-│   ├── Success → Continue
-│   └── Fail → Manual mode
-├── Manual mode (3 min timeout)
-│   └── Wait for user to solve
-└── Click "Continue" button
-```
-
-### 4. Ollama Integration
-```python
-OllamaTextAnalyzer.analyze()
-├── Construct prompt with system message
-├── Send to Ollama API (localhost:11434)
-├── Parse response (true/false/yes/no/ano/nie)
-└── Return boolean result
-```
-
-## 🐛 Troubleshooting
+## 🦠 Troubleshooting
 
 ### Testing with try.py Demo
 
@@ -393,11 +250,6 @@ This tool is for **educational purposes only**. Users are responsible for:
 
 The authors assume no liability for misuse.
 
-## 👥 Authors
-
-## *yvhdpdngr276* 
-
-
 ## 🔗 Useful Links
 
 - [Selenium Documentation](https://www.selenium.dev/documentation/)
@@ -405,9 +257,4 @@ The authors assume no liability for misuse.
 - [Ollama Documentation](https://github.com/ollama/ollama)
 - [PyPasser GitHub](https://github.com/xHossein/PyPasser)
 - [reCAPTCHA Documentation](https://developers.google.com/recaptcha)
-
 ---
-
-**Last Updated:** November 2025
-
-**Version:** 1.0.0
