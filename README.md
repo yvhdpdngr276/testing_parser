@@ -72,7 +72,7 @@ pip install -r requirements.txt
 
 Before configuring and running the main program, test if captcha solving works:
 ```bash
-python parser/try.py
+python test_solve/try.py
 ```
 
 This will open Google's reCAPTCHA demo page and attempt to solve it automatically. If you see "SUCCESS", you're ready to proceed!
@@ -136,7 +136,7 @@ PROGRESS_FILE = "progress.json"
 
 ### Testing with try.py Demo
 
-If `parser/try.py` fails:
+If `test_solve/try.py` fails:
 
 **Error: ChromeDriver not found**
 ```bash
@@ -202,7 +202,7 @@ Question did not change - page stuck
 
 ### First Time Setup
 
-**Always test captcha solving first!** Run `python parser/try.py` before attempting the main program. This will:
+**Always test captcha solving first!** Run `python test_solve/try.py` before attempting the main program. This will:
 - Verify your Chrome/Chromium installation
 - Test PyPasser functionality  
 - Confirm anti-detection settings work
