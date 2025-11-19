@@ -17,7 +17,7 @@ class DetectionSlovak:
         try:
             cleaned_text = text.replace('\n', ' ').strip()
             detected_lang = detect(cleaned_text)
-            return detected_lang == 'sk'
+            return detected_lang == 'sk' # enter lang what u want to detect
 
         except LangDetectException:
             return False
