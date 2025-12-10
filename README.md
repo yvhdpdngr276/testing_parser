@@ -230,16 +230,6 @@ The browser is configured with anti-detection to avoid bot detection:
 time.sleep(random.uniform(1, 3))  # Add to code
 ```
 
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
 ## ⚖️ Legal Disclaimer
 
 This tool is for **educational purposes only**. Users are responsible for:
