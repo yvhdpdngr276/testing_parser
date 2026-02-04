@@ -71,13 +71,13 @@ class NewPageAnswer(UserLogin):
                 if element:
                     return element.get_text().strip()
                 else:
-                    print(f"[✗] No text found for selector: {selected_element}")
+                    print(f"No text found for selector: {selected_element}")
                     return None
             else:
-                print("[✗] Can't find html content")
+                print("Can't find html content")
                 return None
         except Exception as e:
-            print(f"[✗] Error parsing text: {e}")
+            print(f"Error parsing text: {e}")
             return None
 
     def get_new_question(self, old_question: str, timeout=None) -> bool:
@@ -89,11 +89,11 @@ class NewPageAnswer(UserLogin):
         while time.time() - start_time < timeout:
             new_question = self.parse_text()
             if new_question and new_question != old_question:
-                print("[✓] New question found")
+                print("New question found")
                 return True
             time.sleep(config.POLLING_INTERVAL)
 
-        print("[✗] No new question found - timeout")
+        print("No new question found - timeout")
         return False
 
     def click_answer(self, current_question: str, btn_no_locator: str, btn_yes_locator: str) -> bool:
@@ -102,21 +102,21 @@ class NewPageAnswer(UserLogin):
             # Analyze with Ollama
             try:
                 is_good = self.analyzer.analyze(current_question, timeout=config.OLLAMA_TIMEOUT)
-                print(f"[✓] Ollama result: {is_good}")
+                print(f"Ollama result: {is_good}")
             except (ConnectionError, TimeoutError, ValueError) as e:
-                print(f"[✗] Ollama failed: {e}")
+                print(f"Ollama failed: {e}")
                 raise RuntimeError(f"Ollama service unavailable: {e}")
 
             # Select button
             try:
                 if is_good:
-                    print('[✓] Text is good')
+                    print('Text is good')
                     button = self.driver.find_element(By.CSS_SELECTOR, btn_yes_locator)
                 else:
-                    print('[✗] Text is trash')
+                    print('Text is trash')
                     button = self.driver.find_element(By.CSS_SELECTOR, btn_no_locator)
             except Exception as e:
-                print(f"[✗] Button not found: {e}")
+                print(f"Button not found: {e}")
                 raise RuntimeError(f"Button not found - page state corrupted: {e}")
 
             button.click()
@@ -126,17 +126,17 @@ class NewPageAnswer(UserLogin):
             if self.solve_captcha.has_recaptcha(self.driver, verbose=True):
                 print("[!] Captcha appeared, solving...")
                 self.solve_captcha.if_captcha(self.driver)
-                print("[✓] Captcha solved")
+                print("Captcha solved")
                 time.sleep(0.5)
             else:
-                print("[✓] No captcha detected")
+                print("No captcha detected")
 
             # Wait for question change
             if not self.get_new_question(current_question):
                 # Check if already changed during captcha
                 new_q = self.parse_text()
                 if new_q and new_q != current_question:
-                    print("[✓] Question changed during captcha")
+                    print("Question changed during captcha")
                     return True
                 else:
                     raise RuntimeError("Question did not change - page stuck")
@@ -146,7 +146,7 @@ class NewPageAnswer(UserLogin):
         except RuntimeError:
             raise
         except Exception as e:
-            print(f"[✗] Unexpected error: {type(e).__name__}: {e}")
+            print(f"Unexpected error: {type(e).__name__}: {e}")
             import traceback
             traceback.print_exc()
             raise RuntimeError(f"Unexpected error during answer processing: {e}")
