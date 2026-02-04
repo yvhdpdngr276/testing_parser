@@ -62,9 +62,9 @@ def clear_progress():
     try:
         if os.path.exists(config.PROGRESS_FILE):
             os.remove(config.PROGRESS_FILE)
-            print("[*] Progress file cleared")
+            print(" Progress file cleared")
     except IOError as e:
-        print(f"[!] Warning: Could not clear progress file: {e}")
+        print(f" Warning: Could not clear progress file: {e}")
 
 
 def run_main_logic(restart_count=0):
@@ -81,7 +81,7 @@ def run_main_logic(restart_count=0):
 
         print("=== Starting login ===")
         if parser.user_login(config.LOGIN_URL, config.USER_EMAIL, config.EMAIL_SELECTOR):
-            print("[✓] Login successful\n")
+            print("Login successful\n")
         else:
             print("[✗] Login failed")
             raise RuntimeError("Login failed - restart required")
@@ -92,7 +92,7 @@ def run_main_logic(restart_count=0):
             print("[!] Captcha detected, solving...")
             if not parser.solve_captcha.if_captcha(driver):
                 raise RuntimeError("Failed to solve captcha - restart required")
-            print("[✓] Captcha solved!")
+            print(" Captcha solved!")
 
             try:
                 WebDriverWait(driver, config.CAPTCHA_WAIT_TIMEOUT).until(
@@ -101,13 +101,13 @@ def run_main_logic(restart_count=0):
             except:
                 time.sleep(1)
         else:
-            print("[✓] No captcha detected")
+            print("No captcha detected")
 
         # Load progress
         start_from = load_progress()
         if start_from > 0:
-            print(f"\n[*] Resuming from question {start_from + 1}/{config.TOTAL_QUESTIONS}")
-            print(f"[*] {start_from} question(s) already completed")
+            print(f"\n Resuming from question {start_from + 1}/{config.TOTAL_QUESTIONS}")
+            print(f" {start_from} question(s) already completed")
 
         # Main question loop
         for i in range(start_from, config.TOTAL_QUESTIONS):
@@ -124,19 +124,19 @@ def run_main_logic(restart_count=0):
             if not parser.click_answer(current_question, config.BUTTON_NO_SELECTOR, config.BUTTON_YES_SELECTOR):
                 raise RuntimeError(f"Failed to answer question #{i+1} - restart required")
 
-            print(f"[✓] Question {i+1} answered successfully")
+            print(f" Question {i+1} answered successfully")
             save_progress(i + 1)
 
         print("\n" + "="*50)
-        print(f"[✓] All {config.TOTAL_QUESTIONS} questions completed successfully!")
+        print(f" All {config.TOTAL_QUESTIONS} questions completed successfully!")
         print("="*50)
         clear_progress()
 
     except KeyboardInterrupt:
-        print("\n[!] Program stopped by user (Ctrl+C)")
+        print("\n Program stopped by user (Ctrl+C)")
         raise
     except Exception as e:
-        print(f"\n[✗] Critical error: {e}")
+        print(f"\n Critical error: {e}")
         import traceback
         traceback.print_exc()
         raise
@@ -144,7 +144,7 @@ def run_main_logic(restart_count=0):
         if driver:
             try:
                 driver.quit()
-                print("[*] Browser closed")
+                print(" Browser closed")
             except:
                 pass
 
@@ -164,18 +164,18 @@ def main_with_restart():
     while restart_count <= config.MAX_RESTARTS:
         try:
             run_main_logic(restart_count)
-            print("\n[✓] Program completed successfully!")
+            print("\n Program completed successfully!")
             break
 
         except KeyboardInterrupt:
-            print("\n\n[!] Stopped by user")
+            print("\n\n Stopped by user")
             break
 
         except (RuntimeError, ConnectionError, TimeoutError) as e:
             restart_count += 1
 
             if restart_count > config.MAX_RESTARTS:
-                print(f"\n[✗] Max restarts reached ({config.MAX_RESTARTS})")
+                print(f"\n Max restarts reached ({config.MAX_RESTARTS})")
                 break
 
             print(f"\n{'='*60}")
