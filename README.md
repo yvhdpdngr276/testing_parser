@@ -1,12 +1,13 @@
-#  🎭 Automated WEB Extracted Text Classification <br> & Captcha Solver 
 
-An automated web scraping and text classification tool using Selenium, BeautifulSoup4, Ollama AI, and PyPasser for captcha solving.
+![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=for-the-badge&logo=selenium&logoColor=white) ![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup4-4B0082?style=for-the-badge&logo=python&logoColor=white) 
+![PyPasser](https://img.shields.io/badge/PyPasser-0055FF?style=for-the-badge) ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) 
 
-## 📑 Description
 
-This project automates the process of logging into a website, solving reCAPTCHA v2 challenges, extracting text from web pages, and classifying that text using a local AI model (Ollama with gpt-oss). Based on the AI's classification, the bot automatically clicks appropriate buttons (Yes/No) to approve or reject content according to predefined criteria.
+##  Automated WEB Extracted Text Classification <br> & Captcha Solver 
 
-## 📍 Key Features
+Automates the process of logging into a website, solving reCAPTCHA v2 challenges, extracting text from web pages, and classifying that text using a local AI model (Ollama with gpt-oss). Based on the AI's classification, the bot automatically clicks appropriate buttons (Yes/No) to approve or reject content according to predefined criteria.
+
+## Description
 
 - **Automated Login** - Email-based authentication with anti-detection measures
 - **reCAPTCHA v2 Solver** - Automatic captcha solving using PyPasser with manual fallback
@@ -16,15 +17,9 @@ This project automates the process of logging into a website, solving reCAPTCHA 
 - **Progress Tracking** - Saves progress to resume from interruptions
 - **Anti-Detection** - Browser fingerprint masking to avoid bot detection
 
-## 🛠️ Tech Stack
 
-- **Selenium** - Browser automation and button clicking
-- **BeautifulSoup4** - HTML parsing and text extraction
-- **Ollama** - Local LLM for text analysis (gpt-oss model)
-- **PyPasser** - Automated reCAPTCHA v2 solving
-- **Python 3.13** - Core programming language
 
-## 📥 Installation
+## Installation
 
 ### Prerequisites
 
@@ -132,103 +127,7 @@ MAX_RESTARTS = 5             # Maximum restart attempts on errors
 PROGRESS_FILE = "progress.json"
 ```
 
-## 🦠 Troubleshooting
 
-### Testing with try.py Demo
-
-If `test_solve/try.py` fails:
-
-**Error: ChromeDriver not found**
-```bash
-# Install webdriver-manager
-pip install webdriver-manager
-```
-
-**Error: Chrome binary not found**
-- Update Chrome/Chromium to latest version
-- Or specify path in try.py:
-```python
-options.binary_location = "/path/to/chrome"
-```
-
-**Captcha solving fails in demo**
-- This is normal - PyPasser success rate is 70-90%
-- Try running the demo multiple times
-- If it consistently fails, manual solving will be used in main program
-
-### Ollama Connection Error
-```
-Failed to connect to Ollama at http://localhost:11434
-```
-**Solution:** Start Ollama service
-```bash
-ollama serve
-```
-
-### Browser Not Found
-```
-selenium.common.exceptions.WebDriverException
-```
-**Solution:** Update `BROWSER_BINARY_PATH` in `config.py` to correct Chrome/Chromium location
-
-### Captcha Not Solving
-```
-pypasser failed, trying manual...
-```
-**Solution:** 
-- Normal behavior, solve manually in browser
-- PyPasser success rate varies (70-90%)
-- Manual solving always available as fallback
-
-### Button Not Found
-```
-Button not found - page state corrupted
-```
-**Solution:** Check CSS selectors in `config.py`:
-- `BUTTON_YES_SELECTOR`
-- `BUTTON_NO_SELECTOR`
-- Use browser DevTools to verify correct selectors
-
-### Question Not Changing
-```
-Question did not change - page stuck
-```
-**Solution:**
-- Increase `NEW_QUESTION_TIMEOUT` in config
-- Check if captcha appeared (may need solving)
-- Verify page actually loads new content
-
-## ⚠️ Important Notes
-
-### First Time Setup
-
-**Always test captcha solving first!** Run `python test_solve/try.py` before attempting the main program. This will:
-- Verify your Chrome/Chromium installation
-- Test PyPasser functionality  
-- Confirm anti-detection settings work
-- Save you time troubleshooting later
-
-If the demo fails multiple times, you may need to rely on manual captcha solving in the main program.
-
-### Anti-Detection Measures
-The browser is configured with anti-detection to avoid bot detection:
-- Removes `navigator.webdriver` property
-- Disables automation flags
-- Uses custom window size
-- May still be detected by advanced systems
-
-### Captcha Solving
-- **Automatic solving** takes 30-120 seconds
-- **Success rate** varies (70-90%)
-- **Manual fallback** always available (3 min timeout)
-- PyPasser uses audio challenge solving
-
-### Rate Limiting
-- No built-in rate limiting
-- Add delays in config if needed:
-```python
-time.sleep(random.uniform(1, 3))  # Add to code
-```
 
 ## ⚖️ Legal Disclaimer
 
@@ -239,12 +138,3 @@ This tool is for **educational purposes only**. Users are responsible for:
 - Following local laws and regulations
 
 The authors assume no liability for misuse.
-
-## 🔗 Useful Links
-
-- [Selenium Documentation](https://www.selenium.dev/documentation/)
-- [BeautifulSoup Documentation](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
-- [Ollama Documentation](https://github.com/ollama/ollama)
-- [PyPasser GitHub](https://github.com/xHossein/PyPasser)
-- [reCAPTCHA Documentation](https://developers.google.com/recaptcha)
----
