@@ -5,10 +5,6 @@
 
 ##  Automated WEB Extracted Text Classification <br> & Captcha Solver 
 
-Automates the process of logging into a website, solving reCAPTCHA v2 challenges, extracting text from web pages, and classifying that text using a local AI model (Ollama with gpt-oss). Based on the AI's classification, the bot automatically clicks appropriate buttons (Yes/No) to approve or reject content according to predefined criteria.
-
-## Description
-
 - **Automated Login** - Email-based authentication with anti-detection measures
 - **reCAPTCHA v2 Solver** - Automatic captcha solving using PyPasser with manual fallback
 - **Text Extraction** - Web scraping using BeautifulSoup4 with CSS selectors
@@ -16,7 +12,6 @@ Automates the process of logging into a website, solving reCAPTCHA v2 challenges
 - **Auto-Restart** - Recovers from errors automatically with configurable retry limits
 - **Progress Tracking** - Saves progress to resume from interruptions
 - **Anti-Detection** - Browser fingerprint masking to avoid bot detection
-
 
 
 ## Installation
@@ -81,7 +76,7 @@ Create your `config.py` file (see Configuration section below)
 python main.py
 ```
 
-## ⚙️ Configuration
+## ⚙️ Configuration !
 
 Create a `config.py` file in the root directory with the following settings:
 ```python
