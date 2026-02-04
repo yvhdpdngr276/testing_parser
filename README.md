@@ -16,13 +16,9 @@
 
 ## Installation
 
-### Prerequisites
-
 1. **Python 3.13+** installed
 2. **Chrome/Chromium browser** installed
 3. **Ollama** installed and running locally
-
-### Quick Start Guide
 
 **Step 1:** Install Ollama
 ```bash
