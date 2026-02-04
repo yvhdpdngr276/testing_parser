@@ -72,7 +72,7 @@ Create your `config.py` file (see Configuration section below)
 python main.py
 ```
 
-## ⚙️ Configuration !
+## Configuration 
 
 Create a `config.py` file in the root directory with the following settings:
 ```python
