@@ -102,8 +102,8 @@ class CapchaSolver:
             time.sleep(2)
 
             if not self.has_recaptcha(driver):
-                print("\n[✓] Captcha solved manually!")
-                print("[*] Searching for 'Continue' button...")
+                print("\n Captcha solved manually!")
+                print("Searching for 'Continue' button...")
                 try:
                     time.sleep(1)
 
@@ -135,54 +135,54 @@ class CapchaSolver:
 
             elapsed = int(time.time() - start_time)
             remaining = timeout - elapsed
-            print(f"\r[*] Waiting... Time left: {remaining} sec", end="", flush=True)
+            print(f"\r Waiting... Time left: {remaining} sec", end="", flush=True)
 
-        print("\n[✗] Timeout expired")
+        print("\n Timeout expired")
         return False
 
     def solve_captcha_auto(self, driver) -> bool:
         """Automatically solve captcha using pypasser"""
-        print("[*] Starting AUTOMATIC captcha solving...")
-        print("[*] WARNING: May take 30-120 seconds...")
+        print("Starting AUTOMATIC captcha solving...")
+        print("WARNING: May take 30-120 seconds...")
 
         try:
-            print("[*] Running pypasser...")
+            print("Running pypasser...")
             start_time = time.time()
             is_solved = reCaptchaV2(driver=driver, play=False)
             elapsed = time.time() - start_time
-            print(f"[*] pypasser execution time: {elapsed:.2f}s")
+            print(f"pypasser execution time: {elapsed:.2f}s")
 
             if is_solved:
-                print("[✓] Captcha solved by pypasser!")
+                print("Captcha solved by pypasser!")
                 time.sleep(1)
                 return True
             else:
-                print("[✗] pypasser failed, trying manual...")
+                print("pypasser failed, trying manual...")
                 return self.solve_captcha_manual_wait(driver)
 
         except KeyboardInterrupt:
-            print("\n[!] Captcha solving interrupted by user (Ctrl+C)")
+            print("\n Captcha solving interrupted by user (Ctrl+C)")
             return False
         except Exception as e:
-            print(f"[✗] pypasser error: {type(e).__name__}: {e}")
-            print("[*] Switching to manual solving...")
+            print(f"pypasser error: {type(e).__name__}: {e}")
+            print("Switching to manual solving...")
             return self.solve_captcha_manual_wait(driver)
 
     def if_captcha(self, driver) -> bool:
         """Check and solve captcha if present"""
         if self.has_recaptcha(driver):
-            print("[!] Captcha detected")
+            print("Captcha detected")
 
             if self.solve_captcha_auto(driver):
-                print("[✓] Captcha solved!")
+                print("Captcha solved!")
 
                 # Check if already gone
                 if not self.has_recaptcha(driver, verbose=False):
-                    print("[✓] Captcha completely resolved")
+                    print("Captcha completely resolved")
                     return True
 
                 # Need to click Continue button
-                print("[*] Searching for 'Continue' button...")
+                print("Searching for 'Continue' button...")
                 try:
                     time.sleep(1)
 
@@ -208,7 +208,7 @@ class CapchaSolver:
                         if self.has_recaptcha(driver, verbose=False):
                             raise RuntimeError("Captcha still present after solving")
 
-                        print("[✓] Captcha verified gone")
+                        print("Captcha verified gone")
                         return True
                     else:
                         raise RuntimeError("'Continue' button not found")
@@ -216,13 +216,13 @@ class CapchaSolver:
                 except RuntimeError:
                     raise
                 except Exception as e:
-                    print(f"[✗] Error clicking 'Continue': {e}")
+                    print(f"Error clicking 'Continue': {e}")
                     import traceback
                     traceback.print_exc()
                     raise RuntimeError(f"Error during 'Continue' button handling: {e}")
             else:
-                print("[✗] Failed to solve captcha")
+                print(" Failed to solve captcha")
                 raise RuntimeError("Failed to solve captcha")
 
-        print("[✓] No captcha detected")
+        print("No captcha detected")
         return True
